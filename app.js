@@ -7,7 +7,7 @@ app.use(express.json());
 
 // Routes
 app.use(require('./routes/agriot_routes.js'));
-
+app.use(require('./routes/forecast_routes.js'));
 
 // Start WebService
 app.listen(app.get('port'), () => {
