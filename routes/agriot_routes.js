@@ -1,48 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const mysqlConnection = require('../db/database.js');
-const bodyParser = require('body-parser');
+const agriot = require('../services/agriot');
 
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: false }));
-
-// Guardar datos de Sensor Kakao en DB con req.body.params
-// router.post('/kakao',(req, res) => {
-//   let data = {
-//     temperatura: req.body.temperatura, 
-//     humedad: req.body.humedad
-//   };
-//   let sql = "INSERT INTO sensor_kakao SET ?";
-//   mysqlConnection.query(sql, data,(err, results) => {
-//     if(err) throw err;
-//     res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-//   });
-// });
-
-// Guardar datos de SensorKakao usando req.query.params
-router.post('/sensor_data',(req, res) => {
-  let data = {
-    nodo_sensor1: req.body.nodo_sensor1, 
-    nodo_sensor2: req.body.nodo_sensor2,
-    nodo_sensor3: req.body.nodo_sensor3,
-    nodo_sensor4: req.body.nodo_sensor4
-  };
-  let sql = "INSERT INTO sensors SET ?";
-  mysqlConnection.query(sql, data,(err, results) => {
-    if(err) throw err;
-    res.send(JSON.stringify({"status": 200, "error": null, "response": results}));
-  });
+/* GET humedad_suelo listing. */
+router.get('/', function(req, res, next) {
+  try {
+    res.json(agriot.getMultiple(req.query.page));
+  } catch(err) {
+    console.error(`Error while getting quotes `, err.message);
+    next(err);
+  }
 });
 
-// Obtener datos de Sensor Kakao desde DB
-router.get('/sensor_data', (req, res) => {
-  mysqlConnection.query('SELECT * FROM sensors', (err, rows, fields) => {
-    if(!err) {
-      res.json(rows);
-    } else {
-      console.log(err);
-    }
-  });  
+/* POST humedad_suelo values */
+router.post('/', function(req, res, next) {
+  try {
+    res.json(agriot.create(req.body));
+  } catch(err) {
+    console.error(`Error while adding quotes `, err.message);
+    next(err);
+  }
 });
-  
+
 module.exports = router;
